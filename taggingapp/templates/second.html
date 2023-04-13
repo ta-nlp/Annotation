@@ -1,0 +1,242 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  {% load static %}  
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Annotate Text</title>
+    {% comment %} <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        crossorigin="anonymous"> {% endcomment %}
+    <link rel="stylesheet" href="{% static '/bootstrap.css'%}">
+    <link rel="stylesheet" href="{% static '/styles.css'%}">
+
+    
+</head>
+
+<body>
+    <div class="wrapper d-flex">
+        <div class="sidebar">
+
+        </div>
+
+        <!-- Page content -->
+        <div class="content">
+
+            <div class="card">
+                <div class="card-header">
+                    <form>
+                        <div class="input-group mb-3">
+                            <input type="text" id="new_tag" placeholder="New tag">
+                            <div class="input-group-append">
+                                <button onclick="addOption()" class="btn btn-outline-success" type="submit">Add</button>
+                            </div>
+                        </div>
+                    </form>
+                    <select name="work_days" id="id_work_days" multiple>
+                        {% comment %} <option value="person#A538FA" style="background:#A538FA">person</option>
+                        <option value="place#38EBFA"  style="background:#38EBFA">place</option>
+                        <option value="org#EEFA38"  style="background:#EEFA38">organization</option> {% endcomment %}
+                        <option value="none">None</option>
+                        {% comment %} <option value="name">name</option> {% endcomment %}
+                    </select>
+                </div>
+                <div class="card-body" id="textmain" contenteditable="true" style="line-height:2.4; height: 58vh;
+                overflow-y: scroll;" contenteditable>
+                    {% comment %} <textarea class="form-control" rows="14">{{ text | safe }}</textarea> {% endcomment %}
+                    <p>{{ text | safe }}</p>
+
+                  </div>
+                <div class="card-footer">
+                  {% comment %} <a href="{% static '/data.json'%}" download> {% endcomment %}
+                    <button class="btn btn-primary" type="button" onclick="exportData()">Export as json</button>
+                    <button class="btn btn-primary" type="button" onclick="exportDataasCSV()">Export as csv</button>
+                    {% comment %} <button class="btn btn-primary" type="button" onclick="exportDataasPDF()">Export as pdf</button> {% endcomment %}
+                    {% comment %} </a>   {% endcomment %}
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    {% comment %} <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script> {% endcomment %}
+    <script src="{% static '/jquery-3.3.1.min.js'%}"></script>
+    <script src="{% static '/filesaver.js'%}"></script>
+
+    <script src="{% static '/js/jspdf.debug.js'%}"></script>
+    <script src="{% static '/js/html2canvas.min.js'%}"></script>
+    <script src="{% static '/js/html2pdf.min.js'%}"></script>
+
+    <script type="text/javascript">
+      {% comment %} function getRandomColor() {
+        var letters = '0123456789ABCDEF';
+        var color = '#';
+        for (var i = 0; i < 6; i++) {
+          color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+      } {% endcomment %}
+        function getRandomColor() {
+            var letters = 'BCDEF'.split('');
+            var color = '#';
+            for (var i = 0; i < 6; i++ ) {
+                color += letters[Math.floor(Math.random() * letters.length)];
+            }
+            return color;
+        }
+      
+        function addOption() {
+          event.preventDefault();
+          var tag = document.getElementById("new_tag").value.trim();
+          if(tag=="" || tag==" "){
+            return;
+          }
+          var color = getRandomColor();
+          optionText = tag;
+          optionValue = tag+color;
+          var x = document.getElementById('id_work_days');
+          let data = {}
+          for (var i = 1; i < x.length; i++) {
+            t = x[i].text;
+            data[t] = 1
+            if(optionText in data){
+              alert("This tag already exists.");
+              document.getElementById("new_tag").value = "";
+              return;  
+            }              
+          }
+
+  
+          $('#id_work_days').append(`<option value="${optionValue}"  style="background:${color}">
+                                       ${optionText}
+                                  </option>`);
+          document.getElementById("new_tag").value = "";
+        }
+
+        const mouseUpHandler = function surroundSelection() {
+          var selectBox = document.getElementById("id_work_days");
+          var selectedValue = selectBox.options[selectBox.selectedIndex].value;
+          const myArray = selectedValue.split("#");
+          var value = myArray[0];
+          var colorcode = myArray[1];
+          // alert(selectedValue); 
+          if(value == 'none')
+            return;
+
+          var span = document.createElement("span");
+          span.style.fontWeight = "bold";
+          span.style.color = "black";
+  
+          if (window.getSelection) {
+              var sel = window.getSelection();
+              var spanNode = document.createElement('span')
+              spanNode.className = "annotate_span"
+              spanNode.textContent = value
+              if(sel.rangeCount && sel != "" && sel != " "){
+                var mark = document.createElement("mark");
+                mark.className = "entity entity_change";
+                mark.style.background = "#"+colorcode;
+                var n = sel.rangeCount;
+                while(n != 0) {
+                    var range = sel.getRangeAt(n-1).cloneRange();
+                    range.surroundContents(mark);
+                    
+                    mark.appendChild(spanNode)
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                    n--;
+                }
+              }
+              window.getSelection()?.removeAllRanges();
+          }
+        }
+
+        const extractEntityData = () => {
+          const tags = document.getElementsByClassName('entity')
+          let data = {}
+
+          for(let i = 0; i < tags.length; i++) {
+
+            const entityName = tags[i].childNodes[0].data.replace("\n",'').trim()
+            const entityType = tags[i].childNodes[1].innerText
+
+            console.log(entityName)
+
+            if(entityType in data)
+              data[entityType].push(entityName)
+            else
+              data[entityType] = [entityName]
+          }
+
+          return data
+        }
+        const exportData = () => {
+          var data = extractEntityData()
+          var fileName = 'myData.json';
+          
+          // Create a blob of the data
+          var fileToSave = new Blob([JSON.stringify(data)], {
+              type: 'application/json'
+          });
+          
+          // Save the file
+          saveAs(fileToSave, fileName);
+        }
+
+        const exportDataasCSV = () => {
+          var obj = extractEntityData();
+          var str = ''
+          for (const [key, value] of Object.entries(obj)) {
+            for(let i=0; i<value.length; i++){
+              str += key + ',' + value[i] + '\n';
+            }
+          }
+          console.log(str);
+          var fileName = 'myData.csv';
+          const fileToSave = new Blob([str], { type: 'text/csv;iso-8859-1,' })
+          saveAs(fileToSave, fileName);
+        }
+
+
+        const exportDataasPDF = () => {
+          /* const doc = new jsPDF({ unit: 'pt' }) // create jsPDF object
+          const pdfElement = document.getElementById('textmain') // HTML element to be converted to PDF
+
+          doc.html(pdfElement, {
+            callback: (pdf) => {
+              pdf.save('MyPdfFile.pdf')
+            },
+            margin: 32, // optional: page margin
+            // optional: other HTMLOptions
+          }) */
+          const element = document.getElementById('textmain');
+          html2pdf().from(element).set(options).save();
+        }
+        const options = {
+          margin: 1,
+          filename: 'myData.pdf',
+          image: { 
+            type: 'jpeg', 
+            quality: 0.98
+          },
+          html2canvas: { 
+            scale: 20
+          },
+          jsPDF: { 
+            unit: 'in', 
+            format: 'letter', 
+            orientation: 'portrait' 
+          }
+        }
+        
+        
+
+        $('.card-body').on('mouseup', mouseUpHandler);
+
+
+    </script>
+</body>
+
+</html>

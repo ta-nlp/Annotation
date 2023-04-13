@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  {% load static %} 
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    {% comment %} <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        crossorigin="anonymous"> {% endcomment %}
+    <link rel="stylesheet" href="{% static '/bootstrap.css'%}">
+    <link rel="stylesheet" href="./styles.css">
+    <title>Text-annotator</title>
+    <style>
+        .sidebar {
+            margin: 0;
+            padding: 0;
+            width: 250px;
+            background-color: #f1f1f1;
+            position: fixed;
+            height: 100%;
+            overflow: auto;
+          }
+          
+          /* Sidebar links */
+          .sidebar a {
+            display: block;
+            color: black;
+            padding: 16px;
+            text-decoration: none;
+          }
+          
+          /* Active/current link */
+          .sidebar a.active {
+            background-color: #04AA6D;
+            color: white;
+          }
+          
+          /* Links on mouse-over */
+          .sidebar a:hover:not(.active) {
+            background-color: #555;
+            color: white;
+          }
+          
+          /* Page content. The value of the margin-left property should match the value of the sidebar's width property */
+          div.content {
+            margin-left: 250px;
+            padding: 1px 16px;
+            /* height: 1000px; */
+            margin-top: 30px;
+            width: 1000px;
+          }
+        
+          /* On screens that are less than 700px wide, make the sidebar into a topbar */
+          @media screen and (max-width: 700px) {
+            .sidebar {
+              width: 100%;
+              height: auto;
+              position: relative;
+            }
+            .sidebar a {float: left;}
+            div.content {margin-left: 0;}
+          }
+          
+          /* On screens that are less than 400px, display the bar vertically, instead of horizontally */
+          @media screen and (max-width: 400px) {
+            .sidebar a {
+              text-align: center;
+              float: none;
+            }
+          }
+        
+        
+          #id_work_days{
+            width: 100%;
+            height: 44px;
+            border: none;
+            overflow: hidden;
+            background-color: rgba(253, 252, 252, 0.03);
+          }
+          #id_work_days::-moz-focus-inner {
+            border: 0;
+          }
+          #id_work_days:focus {
+            outline: none;
+          }
+          #id_work_days option{
+            /* width: 60px; */
+            font-size: 1.2em;
+            padding: 1px 10px;
+            text-align: center;
+            margin-right: 20px;
+            display: inline-block;
+            cursor: pointer;
+            border:rgb(73, 106, 71) solid 1px;
+            border-radius: 5px;
+            color: rgb(5, 5, 5);
+            background-color: rgb(225, 225, 225);
+          }
+    </style>
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">Text Tagging</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+      <div class="navbar-nav">
+        <a class="nav-item nav-link active" href="/">Home <span class="sr-only">(current)</span></a>
+        <a class="nav-item nav-link" href="#">Help</a>
+        {% comment %} <a class="nav-item nav-link" href="#">Pricing</a> {% endcomment %}
+        {% comment %} <a class="nav-item nav-link disabled" href="#">Disabled</a> {% endcomment %}
+      </div>
+    </div>
+  </nav>
+
+
+    <div style="width:80%; margin:auto;"> 
+        <div class="p-3" style="background-color: rgba(0, 0, 0, 0.2);">
+            <h5>How to use this tool ?</h5>
+            <ul>
+                <li><b>Either upload a Text file or write in the given textarea.</b><br />
+                    Put all the text in a text file and save it and that text file can be used to annotate or You can
+                    write or paste text in textarea.</li>
+
+                <li><b>Start Annotating</b><br /> After clicking on annotate you'll be redirected to a webpage where you
+                    can create any number of custom names to annotate your texts.</li>
+                <li><b>Export annotated text as a pdf</b><br /> you can also export this annotated text as a pdf or json
+                    if you want.</li>
+
+            </ul>
+        </div>
+        <br>
+        <div>
+            <b>Step 1: Either write text in textarea or upload the pdf.</b><br>
+            <img style="object-fit: cover; width:100%; margin:30px 0;" src="{% static 'images/1.jpg'%}" />
+            <b>Step 2: upload a pdf here.</b><br>
+            <img style="object-fit: cover; width:100%; margin:30px 0;" src="{% static 'images/2.jpg'%}" />
+            <b>Step 3: Now choose Annotate text button.</b><br>
+            <img style="object-fit: cover; width:100%; margin:30px 0;" src="{% static 'images/3.jpg'%}" />
+            <b>Step 4: All content will be copied and ready to annotate.</b><br>
+            <img style="object-fit: cover; width:100%; margin:30px 0;" src="{% static 'images/4.jpg'%}" />
+            <b>Step 5: Adding new tag.</b><br>
+            <img style="object-fit: cover; width:100%; margin:30px 0;" src="{% static 'images/5.jpg'%}" />
+            <b>Step 6: Annotate text by selecting word(s) inside textarea.</b><br>
+            <img style="object-fit: cover; width:100%; margin:30px 0;" src="{% static 'images/6.jpg'%}" />
+        </div>
+    </div>
+
+    {% comment %} <footer class="bg-light text-lg-start">
+        
+    </footer> {% endcomment %}
+
+</body>
+
+
+</html>
